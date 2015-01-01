@@ -21,5 +21,5 @@ func main() {
 	s := server.NewServer()
 	s.Addr = *addr
 	s.CmdDir = *cmddir
-	log.Fatal(s.Start())
+	log.Fatalln(s.Start())
 }

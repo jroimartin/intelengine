@@ -6,10 +6,12 @@ package server
 
 import (
 	"errors"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"path"
+	"sync"
 
 	"github.com/howeyc/fsnotify"
 	"github.com/jroimartin/orujo"
@@ -17,19 +19,23 @@ import (
 )
 
 type Server struct {
-	Logger   *log.Logger
-	Addr     string
-	CmdDir   string
-	commands []command
+	Addr   string
+	CmdDir string
+
+	logger   *log.Logger
+	commands map[string]*command
+	mutex    sync.RWMutex
 }
 
 func NewServer() *Server {
 	s := new(Server)
-	s.Logger = log.New(os.Stdout, "[intelengine] ", log.LstdFlags)
+	s.logger = log.New(os.Stdout, "[intelengine] ", log.LstdFlags)
 	return s
 }
 
 func (s *Server) Start() error {
+	s.initCommands()
+
 	if err := s.setupWatcher(); err != nil {
 		return err
 	}
@@ -46,18 +52,49 @@ func (s *Server) setupServer() error {
 		return errors.New("Server.Addr cannot be an empty string")
 	}
 
-	os := orujo.NewServer(s.Addr)
+	websrv := orujo.NewServer(s.Addr)
 
-	logHandler := olog.NewLogHandler(s.Logger, logLine)
+	logHandler := olog.NewLogHandler(s.logger, logLine)
 
-	// TODO: Add routes
-	os.RouteDefault(http.NotFoundHandler(), orujo.M(logHandler))
+	websrv.RouteDefault(http.NotFoundHandler(), orujo.M(logHandler))
 
-	if err := os.ListenAndServe(); err != nil {
+	websrv.Route(`^/cmd/list$`,
+		http.HandlerFunc(s.listCommandsHandler),
+		orujo.M(logHandler))
+
+	if err := websrv.ListenAndServe(); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (s *Server) initCommands() {
+	s.mutex.Lock()
+	s.commands = make(map[string]*command)
+
+	files, err := ioutil.ReadDir(s.CmdDir)
+	if err != nil {
+		s.logger.Println("command update error:", err)
+		return
+	}
+
+	for _, f := range files {
+		if path.Ext(f.Name()) != ".cmd" {
+			continue
+		}
+
+		fileName := path.Join(s.CmdDir, f.Name())
+		cmd, err := readCommandFile(fileName)
+		if err != nil {
+			s.logger.Println("command update error:", err)
+			return
+		}
+
+		s.commands[cmd.Name] = cmd
+		s.logger.Println("command updated:", cmd.Name)
+	}
+	s.mutex.Unlock()
 }
 
 func (s *Server) setupWatcher() error {
@@ -70,7 +107,7 @@ func (s *Server) setupWatcher() error {
 		return err
 	}
 
-	go s.trackCmds(watcher)
+	go s.trackCommands(watcher)
 
 	if err = watcher.Watch(s.CmdDir); err != nil {
 		return err
@@ -79,16 +116,16 @@ func (s *Server) setupWatcher() error {
 	return nil
 }
 
-func (s *Server) trackCmds(watcher *fsnotify.Watcher) {
+func (s *Server) trackCommands(watcher *fsnotify.Watcher) {
 	for {
 		select {
 		case ev := <-watcher.Event:
 			if path.Ext(ev.Name) != ".cmd" {
 				continue
 			}
-			s.Logger.Print("watcher evernt:", ev)
+			s.initCommands()
 		case err := <-watcher.Error:
-			s.Logger.Print("watcher error:", err)
+			s.logger.Println("watcher error:", err)
 		}
 	}
 }
