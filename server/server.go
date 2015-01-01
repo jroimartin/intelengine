@@ -62,6 +62,10 @@ func (s *Server) setupServer() error {
 		http.HandlerFunc(s.listCommandsHandler),
 		orujo.M(logHandler))
 
+	websrv.Route(`^/cmd/exec/\w+$`,
+		http.HandlerFunc(s.runCommandHandler),
+		orujo.M(logHandler))
+
 	if err := websrv.ListenAndServe(); err != nil {
 		return err
 	}
@@ -80,7 +84,7 @@ func (s *Server) initCommands() {
 	}
 
 	for _, f := range files {
-		if path.Ext(f.Name()) != ".cmd" {
+		if f.IsDir() || path.Ext(f.Name()) != ".cmd" {
 			continue
 		}
 
