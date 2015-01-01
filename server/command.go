@@ -12,6 +12,8 @@ import (
 	"net/http"
 	"os/exec"
 	"strings"
+
+	"github.com/jroimartin/orujo"
 )
 
 type command struct {
@@ -39,12 +41,12 @@ func readCommandFile(path string) (*command, error) {
 	return cmd, nil
 }
 
-// TODO Use stdin as input
+// TODO (jrm): Use stdin as input
 func (cmd *command) Run() (output []byte, err error) {
 	return exec.Command(cmd.Cmd, cmd.Args...).Output()
 }
 
-// TODO return json data
+// TODO (jrm): return json data
 func (s *Server) listCommandsHandler(w http.ResponseWriter, r *http.Request) {
 	s.mutex.RLock()
 	for _, cmd := range s.commands {
@@ -55,6 +57,7 @@ func (s *Server) listCommandsHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) getCommand(name string) *command {
 	var cmd *command
+
 	s.mutex.RLock()
 	for _, c := range s.commands {
 		if c.Name == name {
@@ -63,10 +66,11 @@ func (s *Server) getCommand(name string) *command {
 		}
 	}
 	s.mutex.RUnlock()
+
 	return cmd
 }
 
-// TODO pass body by stdin to command
+// TODO (jrm): pass body by stdin to command
 func (s *Server) runCommandHandler(w http.ResponseWriter, r *http.Request) {
 	name := strings.TrimPrefix(r.URL.Path, "/cmd/exec/")
 
@@ -76,11 +80,11 @@ func (s *Server) runCommandHandler(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprint(w, string(out))
 		} else {
 			w.WriteHeader(http.StatusInternalServerError)
-			s.logger.Println("command execution error:", err)
+			orujo.RegisterError(w, fmt.Errorf("command execution error: %v", err))
 		}
 	} else {
 		w.WriteHeader(http.StatusInternalServerError)
-		s.logger.Println("command not found:", name)
+		orujo.RegisterError(w, fmt.Errorf("command not found: %v", name))
 	}
 	s.mutex.RUnlock()
 }

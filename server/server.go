@@ -79,7 +79,7 @@ func (s *Server) initCommands() {
 
 	files, err := ioutil.ReadDir(s.CmdDir)
 	if err != nil {
-		s.logger.Println("command update error:", err)
+		s.logger.Println("initCommands error:", err)
 		return
 	}
 
@@ -91,7 +91,7 @@ func (s *Server) initCommands() {
 		fileName := path.Join(s.CmdDir, f.Name())
 		cmd, err := readCommandFile(fileName)
 		if err != nil {
-			s.logger.Println("command update error:", err)
+			s.logger.Println("initCommands error:", err)
 			return
 		}
 
@@ -120,6 +120,7 @@ func (s *Server) setupWatcher() error {
 	return nil
 }
 
+// XXX (jrm): Update command list with every event?
 func (s *Server) trackCommands(watcher *fsnotify.Watcher) {
 	for {
 		select {
@@ -129,7 +130,7 @@ func (s *Server) trackCommands(watcher *fsnotify.Watcher) {
 			}
 			s.initCommands()
 		case err := <-watcher.Error:
-			s.logger.Println("watcher error:", err)
+			s.logger.Println("trackCommands error:", err)
 		}
 	}
 }
