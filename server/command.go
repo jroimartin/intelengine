@@ -49,42 +49,45 @@ func (cmd *command) Run() (output []byte, err error) {
 // TODO (jrm): return json data
 func (s *Server) listCommandsHandler(w http.ResponseWriter, r *http.Request) {
 	s.mutex.RLock()
+	defer s.mutex.RUnlock()
+
 	for _, cmd := range s.commands {
 		fmt.Fprintf(w, "%#v\n", cmd)
 	}
-	s.mutex.RUnlock()
 }
 
 func (s *Server) getCommand(name string) *command {
-	var cmd *command
-
 	s.mutex.RLock()
-	for _, c := range s.commands {
-		if c.Name == name {
-			cmd = c
-			break
+	defer s.mutex.RUnlock()
+
+	for _, cmd := range s.commands {
+		if cmd.Name == name {
+			return cmd
 		}
 	}
-	s.mutex.RUnlock()
-
-	return cmd
+	return nil
 }
 
 // TODO (jrm): pass body by stdin to command
 func (s *Server) runCommandHandler(w http.ResponseWriter, r *http.Request) {
+	s.mutex.RLock()
+	defer s.mutex.RUnlock()
+
 	name := strings.TrimPrefix(r.URL.Path, "/cmd/exec/")
 
-	s.mutex.RLock()
-	if cmd := s.getCommand(name); cmd != nil {
-		if out, err := cmd.Run(); err == nil {
-			fmt.Fprint(w, string(out))
-		} else {
-			w.WriteHeader(http.StatusInternalServerError)
-			orujo.RegisterError(w, fmt.Errorf("command execution error: %v", err))
-		}
-	} else {
+	cmd := s.getCommand(name)
+	if cmd == nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		orujo.RegisterError(w, fmt.Errorf("command not found: %v", name))
+		return
 	}
-	s.mutex.RUnlock()
+
+	out, err := cmd.Run()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		orujo.RegisterError(w, fmt.Errorf("command execution error: %v", err))
+		return
+	}
+
+	fmt.Fprint(w, string(out))
 }

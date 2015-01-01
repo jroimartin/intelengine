@@ -75,11 +75,13 @@ func (s *Server) setupServer() error {
 
 func (s *Server) initCommands() {
 	s.mutex.Lock()
+	defer s.mutex.Unlock()
+
 	s.commands = make(map[string]*command)
 
 	files, err := ioutil.ReadDir(s.CmdDir)
 	if err != nil {
-		s.logger.Println("initCommands error:", err)
+		s.logger.Println("initCommands warning:", err)
 		return
 	}
 
@@ -91,14 +93,13 @@ func (s *Server) initCommands() {
 		fileName := path.Join(s.CmdDir, f.Name())
 		cmd, err := readCommandFile(fileName)
 		if err != nil {
-			s.logger.Println("initCommands error:", err)
+			s.logger.Println("initCommands warning:", err)
 			return
 		}
 
 		s.commands[cmd.Name] = cmd
 		s.logger.Println("command updated:", cmd.Name)
 	}
-	s.mutex.Unlock()
 }
 
 func (s *Server) setupWatcher() error {
@@ -130,7 +131,7 @@ func (s *Server) trackCommands(watcher *fsnotify.Watcher) {
 			}
 			s.initCommands()
 		case err := <-watcher.Error:
-			s.logger.Println("trackCommands error:", err)
+			s.logger.Println("trackCommands warning:", err)
 		}
 	}
 }
