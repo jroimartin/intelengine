@@ -1,31 +1,25 @@
+// Copyright 2014 The intelengine Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 package main
 
 import (
 	"flag"
 	"log"
-	"net/http"
-	"os"
 
-	"github.com/jroimartin/orujo"
-	olog "github.com/jroimartin/orujo-handlers/log"
+	"github.com/jroimartin/intelengine/server"
 )
 
-var addr = flag.String("addr", ":8080", "HTTP service address")
+var (
+	addr   = flag.String("addr", ":8080", "HTTP service address")
+	cmddir = flag.String("cmddir", "cmds", "directory containing command descriptions")
+)
 
 func main() {
 	flag.Parse()
-
-	logger := log.New(os.Stdout, "[intelengine] ", log.LstdFlags)
-	logHandler := olog.NewLogHandler(logger, logLine)
-
-	s := orujo.NewServer(*addr)
-
-	// TODO: Add routes
-	s.RouteDefault(http.NotFoundHandler(), orujo.M(logHandler))
-
-	log.Fatal(s.ListenAndServe())
+	s := server.NewServer()
+	s.Addr = *addr
+	s.CmdDir = *cmddir
+	log.Fatal(s.Start())
 }
-
-const logLine = `{{.Req.RemoteAddr}} - {{.Req.Method}} {{.Req.RequestURI}}
-{{range  $err := .Errors}}  Err: {{$err}}
-{{end}}`
