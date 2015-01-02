@@ -25,8 +25,8 @@ type command struct {
 	Class       string
 }
 
-func readCommandFile(path string) (*command, error) {
-	f, err := ioutil.ReadFile(path)
+func readCommandFile(filename string) (*command, error) {
+	f, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +37,7 @@ func readCommandFile(path string) (*command, error) {
 	}
 
 	if cmd.Name == "" {
-		errors.New("Command name cannot be an empty string")
+		return nil, errors.New("Command name cannot be an empty string")
 	}
 
 	return cmd, nil
@@ -63,7 +63,7 @@ func (s *Server) listCommandsHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, string(b))
 }
 
-func (s *Server) getCommand(name string) *command {
+func (s *Server) command(name string) *command {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
 
@@ -81,7 +81,7 @@ func (s *Server) runCommandHandler(w http.ResponseWriter, r *http.Request) {
 
 	name := strings.TrimPrefix(r.URL.Path, "/cmd/exec/")
 
-	cmd := s.getCommand(name)
+	cmd := s.command(name)
 	if cmd == nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		orujo.RegisterError(w, fmt.Errorf("command not found: %v", name))
