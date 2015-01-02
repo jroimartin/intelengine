@@ -49,14 +49,18 @@ func (cmd *command) exec(r io.Reader) (output []byte, err error) {
 	return c.Output()
 }
 
-// TODO (jrm): return json data
 func (s *Server) listCommandsHandler(w http.ResponseWriter, r *http.Request) {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
 
-	for _, cmd := range s.commands {
-		fmt.Fprintf(w, "%#v\n", cmd)
+	b, err := json.Marshal(s.commands)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		orujo.RegisterError(w, fmt.Errorf("Cannot marshal commands: %v", err))
+		return
 	}
+
+	fmt.Fprint(w, string(b))
 }
 
 func (s *Server) getCommand(name string) *command {
