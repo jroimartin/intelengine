@@ -121,7 +121,7 @@ func (s *Server) setupWatcher() error {
 	return nil
 }
 
-// XXX (jrm): Update command list with every event?
+// XXX (jrm): Update command list on every event?
 func (s *Server) trackCommands(watcher *fsnotify.Watcher) {
 	for {
 		select {

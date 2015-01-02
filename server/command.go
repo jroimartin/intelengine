@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"os/exec"
@@ -21,6 +22,7 @@ type command struct {
 	Description string
 	Cmd         string
 	Args        []string
+	Class       string
 }
 
 func readCommandFile(path string) (*command, error) {
@@ -41,9 +43,10 @@ func readCommandFile(path string) (*command, error) {
 	return cmd, nil
 }
 
-// TODO (jrm): Use stdin as input
-func (cmd *command) Run() (output []byte, err error) {
-	return exec.Command(cmd.Cmd, cmd.Args...).Output()
+func (cmd *command) exec(r io.Reader) (output []byte, err error) {
+	c := exec.Command(cmd.Cmd, cmd.Args...)
+	c.Stdin = r
+	return c.Output()
 }
 
 // TODO (jrm): return json data
@@ -68,7 +71,6 @@ func (s *Server) getCommand(name string) *command {
 	return nil
 }
 
-// TODO (jrm): pass body by stdin to command
 func (s *Server) runCommandHandler(w http.ResponseWriter, r *http.Request) {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
@@ -82,7 +84,7 @@ func (s *Server) runCommandHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	out, err := cmd.Run()
+	out, err := cmd.exec(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		orujo.RegisterError(w, fmt.Errorf("command execution error: %v", err))
