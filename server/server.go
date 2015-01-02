@@ -136,6 +136,18 @@ func (s *Server) trackCommands(watcher *fsnotify.Watcher) {
 	}
 }
 
+func (s *Server) command(name string) *command {
+	s.mutex.RLock()
+	defer s.mutex.RUnlock()
+
+	for _, cmd := range s.commands {
+		if cmd.Name == name {
+			return cmd
+		}
+	}
+	return nil
+}
+
 const logLine = `{{.Req.RemoteAddr}} - {{.Req.Method}} {{.Req.RequestURI}}
 {{range  $err := .Errors}}  Err: {{$err}}
 {{end}}`
