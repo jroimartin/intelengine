@@ -126,10 +126,9 @@ func (s *Server) trackCommands(watcher *fsnotify.Watcher) {
 	for {
 		select {
 		case ev := <-watcher.Event:
-			if path.Ext(ev.Name) != ".cmd" {
-				continue
+			if path.Ext(ev.Name) == ".cmd" {
+				s.initCommands()
 			}
-			s.initCommands()
 		case err := <-watcher.Error:
 			s.logger.Println("trackCommands warning:", err)
 		}
