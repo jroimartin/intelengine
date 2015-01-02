@@ -20,7 +20,7 @@ func (s *Server) listCommandsHandler(w http.ResponseWriter, r *http.Request) {
 	b, err := json.Marshal(s.commands)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		orujo.RegisterError(w, fmt.Errorf("Cannot marshal commands: %v", err))
+		orujo.RegisterError(w, fmt.Errorf("cannot marshal commands: %v", err))
 		return
 	}
 
