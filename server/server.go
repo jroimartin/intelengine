@@ -91,7 +91,7 @@ func (s *Server) initCommands() {
 		}
 
 		filename := path.Join(s.CmdDir, f.Name())
-		cmd, err := readCommandFile(filename)
+		cmd, err := newCommand(filename)
 		if err != nil {
 			s.logger.Println("initCommands warning:", err)
 			return

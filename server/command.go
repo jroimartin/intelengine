@@ -20,7 +20,7 @@ type command struct {
 	Class       string
 }
 
-func readCommandFile(filename string) (*command, error) {
+func newCommand(filename string) (*command, error) {
 	f, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return nil, err
