@@ -33,19 +33,11 @@ func NewServer() *Server {
 }
 
 func (s *Server) Start() error {
+	if s.Addr == "" || s.CmdDir == "" {
+		return errors.New("Server.Addr and Server.CmdDir cannot be empty strings")
+	}
+
 	s.initCommands()
-
-	if err := s.setupServer(); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (s *Server) setupServer() error {
-	if s.Addr == "" {
-		return errors.New("Server.Addr cannot be an empty string")
-	}
 
 	websrv := orujo.NewServer(s.Addr)
 
