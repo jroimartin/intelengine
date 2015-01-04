@@ -10,7 +10,11 @@ import (
 	"io"
 	"io/ioutil"
 	"os/exec"
+	"path"
+	"strings"
 )
+
+const cmdExt = ".cmd"
 
 type command struct {
 	Name        string
@@ -21,6 +25,10 @@ type command struct {
 }
 
 func newCommand(filename string) (*command, error) {
+	if path.Ext(filename) != cmdExt {
+		return nil, errors.New("not a command file")
+	}
+
 	f, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return nil, err
@@ -30,10 +38,7 @@ func newCommand(filename string) (*command, error) {
 	if err = json.Unmarshal(f, &cmd); err != nil {
 		return nil, err
 	}
-
-	if cmd.Name == "" {
-		return nil, errors.New("Command name cannot be an empty string")
-	}
+	cmd.Name = strings.TrimSuffix(path.Base(filename), cmdExt)
 
 	return cmd, nil
 }

@@ -13,7 +13,6 @@ import (
 	"path"
 	"sync"
 
-	"github.com/howeyc/fsnotify"
 	"github.com/jroimartin/orujo"
 	olog "github.com/jroimartin/orujo-handlers/log"
 )
@@ -36,10 +35,6 @@ func NewServer() *Server {
 func (s *Server) Start() error {
 	s.initCommands()
 
-	if err := s.setupWatcher(); err != nil {
-		return err
-	}
-
 	if err := s.setupServer(); err != nil {
 		return err
 	}
@@ -57,6 +52,13 @@ func (s *Server) setupServer() error {
 	logHandler := olog.NewLogHandler(s.logger, logLine)
 
 	websrv.RouteDefault(http.NotFoundHandler(), orujo.M(logHandler))
+
+	websrv.Route(`^/cmd/refresh$`,
+		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			s.initCommands()
+		}),
+		http.HandlerFunc(s.listCommandsHandler),
+		orujo.M(logHandler))
 
 	websrv.Route(`^/cmd/list$`,
 		http.HandlerFunc(s.listCommandsHandler),
@@ -86,7 +88,7 @@ func (s *Server) initCommands() {
 	}
 
 	for _, f := range files {
-		if f.IsDir() || path.Ext(f.Name()) != ".cmd" {
+		if f.IsDir() || path.Ext(f.Name()) != cmdExt {
 			continue
 		}
 
@@ -98,40 +100,7 @@ func (s *Server) initCommands() {
 		}
 
 		s.commands[cmd.Name] = cmd
-		s.logger.Println("command updated:", cmd.Name)
-	}
-}
-
-func (s *Server) setupWatcher() error {
-	if s.CmdDir == "" {
-		return errors.New("Server.CmdDir cannot be an empty string")
-	}
-
-	watcher, err := fsnotify.NewWatcher()
-	if err != nil {
-		return err
-	}
-
-	go s.trackCommands(watcher)
-
-	if err = watcher.Watch(s.CmdDir); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// TODO (jrm): Update command list on every event?
-func (s *Server) trackCommands(watcher *fsnotify.Watcher) {
-	for {
-		select {
-		case ev := <-watcher.Event:
-			if path.Ext(ev.Name) == ".cmd" {
-				s.initCommands()
-			}
-		case err := <-watcher.Error:
-			s.logger.Println("trackCommands warning:", err)
-		}
+		s.logger.Println("command registered:", cmd.Name)
 	}
 }
 
