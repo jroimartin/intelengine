@@ -37,7 +37,7 @@ func (s *Server) Start() error {
 		return errors.New("Server.Addr and Server.CmdDir cannot be empty strings")
 	}
 
-	s.initCommands()
+	s.refreshCommands()
 
 	websrv := orujo.NewServer(s.Addr)
 
@@ -47,7 +47,7 @@ func (s *Server) Start() error {
 
 	websrv.Route(`^/cmd/refresh$`,
 		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			s.initCommands()
+			s.refreshCommands()
 		}),
 		http.HandlerFunc(s.listCommandsHandler),
 		orujo.M(logHandler))
@@ -67,7 +67,7 @@ func (s *Server) Start() error {
 	return nil
 }
 
-func (s *Server) initCommands() {
+func (s *Server) refreshCommands() {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
@@ -75,7 +75,7 @@ func (s *Server) initCommands() {
 
 	files, err := ioutil.ReadDir(s.CmdDir)
 	if err != nil {
-		s.logger.Println("initCommands warning:", err)
+		s.logger.Println("refreshCommands warning:", err)
 		return
 	}
 
@@ -87,7 +87,7 @@ func (s *Server) initCommands() {
 		filename := path.Join(s.CmdDir, f.Name())
 		cmd, err := newCommand(filename)
 		if err != nil {
-			s.logger.Println("initCommands warning:", err)
+			s.logger.Println("refreshCommands warning:", err)
 			return
 		}
 
