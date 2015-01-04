@@ -60,11 +60,7 @@ func (s *Server) Start() error {
 		http.HandlerFunc(s.runCommandHandler),
 		orujo.M(logHandler))
 
-	if err := websrv.ListenAndServe(); err != nil {
-		return err
-	}
-
-	return nil
+	return websrv.ListenAndServe()
 }
 
 func (s *Server) refreshCommands() {
