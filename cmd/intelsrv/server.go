@@ -52,15 +52,15 @@ func (s *server) start() error {
 			s.refreshCommands()
 		}),
 		http.HandlerFunc(s.listCommandsHandler),
-		orujo.M(logHandler))
+		orujo.M(logHandler)).Methods("GET")
 
 	websrv.Route(`^/cmd/list$`,
 		http.HandlerFunc(s.listCommandsHandler),
-		orujo.M(logHandler))
+		orujo.M(logHandler)).Methods("GET")
 
 	websrv.Route(`^/cmd/exec/\w+$`,
 		http.HandlerFunc(s.runCommandHandler),
-		orujo.M(logHandler))
+		orujo.M(logHandler)).Methods("POST")
 
 	return websrv.ListenAndServe()
 }
