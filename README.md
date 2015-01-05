@@ -84,5 +84,5 @@ but also for exploitation, crawlering, etc.
 The following routes are configured by default:
 
 * **GET /cmd/refresh**: Refresh comand list
-* **GET /cmd/list**: List supported command
+* **GET /cmd/list**: List supported commands
 * **POST /cmd/exec/\<cmdname\>**: Execute the command \<cmdname\>
