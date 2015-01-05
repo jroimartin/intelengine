@@ -25,9 +25,12 @@ type server struct {
 	mutex    sync.RWMutex
 }
 
-func newServer() *server {
-	s := new(server)
-	s.logger = log.New(os.Stdout, "[intelengine] ", log.LstdFlags)
+func newServer(addr, cmdDir string) *server {
+	s := &server{
+		addr:   addr,
+		cmdDir: cmdDir,
+		logger: log.New(os.Stdout, "[intelengine] ", log.LstdFlags),
+	}
 	return s
 }
 

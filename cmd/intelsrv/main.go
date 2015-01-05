@@ -16,8 +16,6 @@ var (
 
 func main() {
 	flag.Parse()
-	s := newServer()
-	s.addr = *addr
-	s.cmdDir = *cmddir
+	s := newServer(*addr, *cmddir)
 	log.Fatalln(s.start())
 }
