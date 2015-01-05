@@ -21,28 +21,28 @@ The main goals of intelengine can be summarized in:
 
 intelengine consists in a client-server architecture.
 
-intelsrv, the *server* component, is an HTTP server that exposes a REST API, that
+intelsrv, the **server** component, is an HTTP server that exposes a REST API, that
 allows the communication between server and clients. The mission of intelsrv is
 handling command execution requests and transmit the output of the issued commands
 to the client, as well as taking care of error handling, concurrency, caching,
 server's OS abstraction, etc.
 
-The *client* can be any program able to interact with the intelsrv's REST API.
+The **client** can be any program able to interact with the intelsrv's REST API.
 
 ## Commands
 
 Commands are splitted in two parts:
 
-* *Definition file* (cmd file)
-* *Implementation* (standalone executable)
+* **Definition file** (cmd file)
+* **Implementation** (standalone executable)
 
-The command *definition file* is a JSON file that defines how the command is
+The command **definition file** is a JSON file that defines how the command is
 called. It must include the following information:
 
-* *description*: Description of the command functionality
-* *path*: Path of the executable that will be called when the command is executed
-* *args*: Arguments passed to the executable when it is called
-* *class*: Command class
+* **description**: Description of the command functionality
+* **path**: Path of the executable that will be called when the command is executed
+* **args**: Arguments passed to the executable when it is called
+* **class**: Command class
 
 The following snippet shows a dummy cmd file:
 
@@ -58,7 +58,7 @@ The following snippet shows a dummy cmd file:
 Also, the definition files must have the extension ".cmd", being the name of the
 command the name of the file without this extension.
 
-The command *implementation* is an standalone executable that implements the
+The command **implementation** is an standalone executable that implements the
 command functionality. By convention, it must wait for JSON input by STDIN and
 write its output in JSON format to STDOUT. Also, it must exit with the return
 value 0 when the execution finished correctly, or any other value on error.
@@ -74,14 +74,15 @@ language that can read from STDIN and write to STDOUT.
 
 ## Transforms vs Commands
 
-The word *command* was chosen rather than *transform*, because a transform can be
-considered as a particular class of command. intelengine is not only aimed at
-being used for data gathering but also for exploitation, crawlering, etc.
+The word **command** was chosen rather than **transform**, because a transform
+can be considered as a particular class of command. intelengine is not only
+aimed at being used for data gathering but also for exploitation, crawlering,
+etc.
 
 ## intelsrv's routes
 
 The following routes are configured by default:
 
-* *GET /cmd/refresh*: Refresh comand list
-* *GET /cmd/list*: List supported command
-* *POST /cmd/exec/<cmdname>*: Execute the command <cmdname>
+* **GET /cmd/refresh**: Refresh comand list
+* **GET /cmd/list**: List supported command
+* **POST /cmd/exec/<cmdname>**: Execute the command <cmdname>
