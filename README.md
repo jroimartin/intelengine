@@ -64,7 +64,7 @@ write its output in JSON format to STDOUT. Also, it must exit with the return
 value 0 when the execution finished correctly, or any other value on error.
 
 The input of the command is the body of the PUT request sent to the intelsrv's
-path "/cmd/exec/<command_name>". On the other hand, the output of the command
+path "/cmd/exec/\<command_name\>". On the other hand, the output of the command
 will be returned to the client in the response body if the command exited
 successfully. Otherwise, if the command exited with error, an HTTP 500 error code
 is returned to the client.
@@ -85,4 +85,4 @@ The following routes are configured by default:
 
 * **GET /cmd/refresh**: Refresh comand list
 * **GET /cmd/list**: List supported command
-* **POST /cmd/exec/<cmdname>**: Execute the command <cmdname>
+* **POST /cmd/exec/\<cmdname\>**: Execute the command <cmdname>
