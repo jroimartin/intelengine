@@ -7,8 +7,6 @@ package main
 import (
 	"flag"
 	"log"
-
-	"github.com/jroimartin/intelengine/server"
 )
 
 var (
@@ -18,8 +16,8 @@ var (
 
 func main() {
 	flag.Parse()
-	s := server.NewServer()
-	s.Addr = *addr
-	s.CmdDir = *cmddir
-	log.Fatalln(s.Start())
+	s := newServer()
+	s.addr = *addr
+	s.cmdDir = *cmddir
+	log.Fatalln(s.start())
 }

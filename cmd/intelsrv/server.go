@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package server
+package main
 
 import (
 	"errors"
@@ -17,29 +17,28 @@ import (
 	olog "github.com/jroimartin/orujo-handlers/log"
 )
 
-type Server struct {
-	Addr   string
-	CmdDir string
-
+type server struct {
+	addr     string
+	cmdDir   string
 	logger   *log.Logger
 	commands map[string]*command
 	mutex    sync.RWMutex
 }
 
-func NewServer() *Server {
-	s := new(Server)
+func newServer() *server {
+	s := new(server)
 	s.logger = log.New(os.Stdout, "[intelengine] ", log.LstdFlags)
 	return s
 }
 
-func (s *Server) Start() error {
-	if s.Addr == "" || s.CmdDir == "" {
-		return errors.New("Server.Addr and Server.CmdDir cannot be empty strings")
+func (s *server) start() error {
+	if s.addr == "" || s.cmdDir == "" {
+		return errors.New("server.addr and server.cmdDir cannot be empty strings")
 	}
 
 	s.refreshCommands()
 
-	websrv := orujo.NewServer(s.Addr)
+	websrv := orujo.NewServer(s.addr)
 
 	logHandler := olog.NewLogHandler(s.logger, logLine)
 
@@ -63,13 +62,13 @@ func (s *Server) Start() error {
 	return websrv.ListenAndServe()
 }
 
-func (s *Server) refreshCommands() {
+func (s *server) refreshCommands() {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
 	s.commands = make(map[string]*command)
 
-	files, err := ioutil.ReadDir(s.CmdDir)
+	files, err := ioutil.ReadDir(s.cmdDir)
 	if err != nil {
 		s.logger.Println("refreshCommands warning:", err)
 		return
@@ -80,7 +79,7 @@ func (s *Server) refreshCommands() {
 			continue
 		}
 
-		filename := path.Join(s.CmdDir, f.Name())
+		filename := path.Join(s.cmdDir, f.Name())
 		cmd, err := newCommand(filename)
 		if err != nil {
 			s.logger.Println("refreshCommands warning:", err)
@@ -92,7 +91,7 @@ func (s *Server) refreshCommands() {
 	}
 }
 
-func (s *Server) command(name string) *command {
+func (s *server) command(name string) *command {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
 

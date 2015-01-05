@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package server
+package main
 
 import (
 	"encoding/json"
@@ -13,7 +13,7 @@ import (
 	"github.com/jroimartin/orujo"
 )
 
-func (s *Server) listCommandsHandler(w http.ResponseWriter, r *http.Request) {
+func (s *server) listCommandsHandler(w http.ResponseWriter, r *http.Request) {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
 
@@ -27,7 +27,7 @@ func (s *Server) listCommandsHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, string(b))
 }
 
-func (s *Server) runCommandHandler(w http.ResponseWriter, r *http.Request) {
+func (s *server) runCommandHandler(w http.ResponseWriter, r *http.Request) {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
 
