@@ -75,9 +75,9 @@ language that can read from STDIN and write to STDOUT.
 ## Transforms vs Commands
 
 The word **command** was chosen rather than **transform**, because a transform
-can be considered as a particular class of command. intelengine is not only
-aimed at being used for data gathering but also for exploitation, crawlering,
-etc.
+can be considered as a particular class of command. It's important to take into
+account that intelengine is not only aimed at being used for data gathering
+but also for exploitation, crawlering, etc.
 
 ## intelsrv's routes
 
@@ -85,4 +85,4 @@ The following routes are configured by default:
 
 * **GET /cmd/refresh**: Refresh comand list
 * **GET /cmd/list**: List supported command
-* **POST /cmd/exec/\<cmdname\>**: Execute the command <cmdname>
+* **POST /cmd/exec/\<cmdname\>**: Execute the command \<cmdname\>
