@@ -9,6 +9,7 @@ import (
 	"errors"
 	"io"
 	"io/ioutil"
+	"os"
 	"os/exec"
 	"path"
 	"strings"
@@ -39,6 +40,9 @@ func newCommand(filename string) (*command, error) {
 		return nil, err
 	}
 	cmd.Name = strings.TrimSuffix(path.Base(filename), cmdExt)
+	for i := range cmd.Args {
+		cmd.Args[i] = os.ExpandEnv(cmd.Args[i])
+	}
 
 	return cmd, nil
 }
