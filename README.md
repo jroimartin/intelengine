@@ -58,8 +58,8 @@ The following snippet shows a dummy cmd file:
 Also, the definition files must have the extension ".cmd", being the name of the
 command the name of the file without this extension.
 
-The command **implementation** is an standalone executable that implements the
-command functionality. By convention, it must wait for JSON input by STDIN and
+The command's **implementation** is an standalone executable that implements the
+command's functionality. By convention, it must wait for JSON input via STDIN and
 write its output in JSON format to STDOUT. Also, it must exit with the return
 value 0 when the execution finished correctly, or any other value on error.
 
