@@ -63,7 +63,7 @@ programming language that can read from STDIN and write to STDOUT.
 The following default routes can be used by clients to control
 intelsrv:
 
-	GET /cmd/refresh: Refresh comand list
+	GET /cmd/refresh: Refresh command list
 	GET /cmd/list: List supported commands
 	POST /cmd/exec/<cmdname>: Execute the command <cmdname>
 
