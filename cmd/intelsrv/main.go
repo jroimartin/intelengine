@@ -11,7 +11,7 @@ import (
 
 var (
 	addr   = flag.String("addr", ":8080", "HTTP service address")
-	cmddir = flag.String("cmddir", "cmds", "directory containing command descriptions")
+	cmddir = flag.String("cmddir", "cmds", "directory containing command definitions")
 )
 
 func main() {
