@@ -22,7 +22,9 @@ type command struct {
 	Description string
 	Cmd         string
 	Args        []string
-	Class       string
+	Input       string
+	Output      string
+	Group       string
 }
 
 func newCommand(filename string) (*command, error) {

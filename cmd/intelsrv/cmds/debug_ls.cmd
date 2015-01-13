@@ -2,5 +2,7 @@
 	"description": "ls -l /tmp/",
 	"cmd": "ls",
 	"args": ["-l", "/tmp/"],
-	"class": "debug"
+	"input": "",
+	"output": "",
+	"group": "debug"
 }
