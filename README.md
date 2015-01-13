@@ -44,7 +44,7 @@ called. It must include the following information:
 * **args**: Arguments passed to the executable when it is called
 * **input**: Type of the input data
 * **output**: Type of the output data
-* **group**: Command class
+* **group**: Command category
 
 The following snippet shows a dummy cmd file:
 
