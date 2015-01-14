@@ -31,7 +31,9 @@ command is called. It must include the following information:
 	path: Path of the executable that will be called when the command is
 		executed
 	args: Arguments passed to the executable when it is called
-	class: Command class
+	input: Type of the input data
+	output: Type of the output data
+	group: Command category
 
 The following snippet shows a dummy cmd file:
 
@@ -39,7 +41,9 @@ The following snippet shows a dummy cmd file:
 		"description": "echo request's body",
 		"cmd": "cat",
 		"args": [],
-		"class": "debug"
+		"input": "",
+		"output": "",
+		"group": "debug"
 	}
 
 Also, the definition files must have the extension ".cmd", being the
@@ -56,6 +60,11 @@ intelsrv's path "/cmd/exec/<cmdname>". On the other hand, the
 output of the command will be returned to the client in the response
 body if the command exited successfully. Otherwise, if the command
 exited with error, an HTTP 500 error code is returned to the client.
+
+Commands must take care of the input and output types specified in their
+definition file. Also, input and output must be treated as arrays of those
+types. For instance, if the input type is "IP", the command should expect an
+array of IPs as input.
 
 Due to these design principles, commands can be implemented in any
 programming language that can read from STDIN and write to STDOUT.
