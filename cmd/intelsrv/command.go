@@ -52,5 +52,6 @@ func newCommand(filename string) (*command, error) {
 func (cmd *command) exec(r io.Reader) (output []byte, err error) {
 	c := exec.Command(cmd.Cmd, cmd.Args...)
 	c.Stdin = r
+	c.Stderr = os.Stderr
 	return c.Output()
 }
