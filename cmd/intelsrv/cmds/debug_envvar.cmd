@@ -1,9 +1,9 @@
 {
-	"description": "test env vars expansion",
-	"cmd": "echo",
-	"args": ["pwd=$PWD", "home=${HOME}"],
-	"input": "",
-	"output": "",
-	"parameters": "",
-	"group": "debug"
+	"Description": "test env vars expansion",
+	"Cmd": "echo",
+	"Args": ["pwd=$PWD", "home=${HOME}"],
+	"Input": "",
+	"Output": "",
+	"Parameters": "",
+	"Group": "debug"
 }

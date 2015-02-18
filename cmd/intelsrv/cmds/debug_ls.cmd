@@ -1,9 +1,9 @@
 {
-	"description": "ls -l /tmp/",
-	"cmd": "ls",
-	"args": ["-l", "/tmp/"],
-	"input": "",
-	"output": "",
-	"parameters": "",
-	"group": "debug"
+	"Description": "ls -l /tmp/",
+	"Cmd": "ls",
+	"Args": ["-l", "/tmp/"],
+	"Input": "",
+	"Output": "",
+	"Parameters": "",
+	"Group": "debug"
 }

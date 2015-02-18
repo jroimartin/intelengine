@@ -1,9 +1,9 @@
 {
-	"description": "return exit code 1",
-	"cmd": "false",
-	"args": [],
-	"input": "",
-	"output": "",
-	"parameters": "",
-	"group": "debug"
+	"Description": "return exit code 1",
+	"Cmd": "false",
+	"Args": [],
+	"Input": "",
+	"Output": "",
+	"Parameters": "",
+	"Group": "debug"
 }
