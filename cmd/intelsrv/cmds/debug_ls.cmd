@@ -4,5 +4,6 @@
 	"args": ["-l", "/tmp/"],
 	"input": "",
 	"output": "",
+	"parameters": "",
 	"group": "debug"
 }

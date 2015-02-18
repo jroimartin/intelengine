@@ -4,5 +4,6 @@
 	"args": [],
 	"input": "",
 	"output": "",
+	"parameters": "",
 	"group": "debug"
 }
