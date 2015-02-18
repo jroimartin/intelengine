@@ -85,8 +85,8 @@ func (s *server) refreshCommands() {
 		filename := path.Join(s.cmdDir, f.Name())
 		cmd, err := newCommand(filename)
 		if err != nil {
-			s.logger.Println("refreshCommands warning:", err)
-			return
+			s.logger.Printf("refreshCommands warning (%v): %v\n", f.Name(), err)
+			continue
 		}
 
 		s.commands[cmd.Name] = cmd
