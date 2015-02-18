@@ -24,6 +24,7 @@ type command struct {
 	Args        []string
 	Input       string
 	Output      string
+	Parameters  string
 	Group       string
 }
 
