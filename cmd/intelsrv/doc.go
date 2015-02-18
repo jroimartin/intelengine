@@ -27,23 +27,25 @@ Commands are splitted in two parts:
 The command definition file is a JSON file that defines how the
 command is called. It must include the following information:
 
-	description: Description of the command functionality
-	path: Path of the executable that will be called when the command is
+	Description: Description of the command functionality
+	Path: Path of the executable that will be called when the command is
 		executed
-	args: Arguments passed to the executable when it is called
-	input: Type of the input data
-	output: Type of the output data
-	group: Command category
+	Args: Arguments passed to the executable when it is called
+	Input: Type of the input data
+	Output: Type of the output data
+	Parameters: Structure describing the type of the accepted parameters
+	Group: Command category
 
 The following snippet shows a dummy cmd file:
 
 	{
-		"description": "echo request's body",
-		"cmd": "cat",
-		"args": [],
-		"input": "",
-		"output": "",
-		"group": "debug"
+		"Description": "echo request's body",
+		"Cmd": "cat",
+		"Args": [],
+		"Input": "",
+		"Output": "",
+		"Parameters": "",
+		"Group": "debug"
 	}
 
 Also, the definition files must have the extension ".cmd", being the
