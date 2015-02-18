@@ -4,6 +4,6 @@
 	"args": [],
 	"input": "",
 	"output": "",
-	"parameters": "asdasd",
+	"parameters": "",
 	"group": "debug"
 }
