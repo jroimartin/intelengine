@@ -14,7 +14,10 @@ import (
 	"github.com/jroimartin/orujo"
 )
 
-const week = 7 * 24 * time.Hour
+const (
+	week = 7 * 24 * time.Hour
+	sep  = '|'
+)
 
 func (s *server) listCommandsHandler(w http.ResponseWriter, r *http.Request) {
 	uuid, err := s.client.Call("listCommands", nil, week)
@@ -24,7 +27,7 @@ func (s *server) listCommandsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	s.logger.Printf("Sent: listCommands(nil) (%v)\n", uuid)
-	fmt.Fprintf(w, "{\"UUID\":\"%q\"}", uuid)
+	fmt.Fprintf(w, "{\"UUID\":%q}", uuid)
 }
 
 func (s *server) commandResultsHandler(w http.ResponseWriter, r *http.Request) {
@@ -50,7 +53,7 @@ func (s *server) runCommandHandler(w http.ResponseWriter, r *http.Request) {
 		orujo.RegisterError(w, fmt.Errorf("ReadAll:", err))
 		return
 	}
-	data := []byte(fmt.Sprintf("%s|%s", name, body))
+	data := []byte(fmt.Sprintf("%s%c%s", name, sep, body))
 	uuid, err := s.client.Call("execCommand", data, week)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -58,5 +61,5 @@ func (s *server) runCommandHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	s.logger.Printf("Sent: execCommand(%v) (%v)\n", data, uuid)
-	fmt.Fprintf(w, "{\"UUID\":\"%q\"}", uuid)
+	fmt.Fprintf(w, "{\"UUID\":%q}", uuid)
 }

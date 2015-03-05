@@ -96,7 +96,7 @@ func (s *server) handleResult(r rpcmq.Result) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if r.Err != "" {
-		s.results[r.UUID] = []byte(fmt.Sprintf("{\"Error\":\"%q\"}", r.Err))
+		s.results[r.UUID] = []byte(fmt.Sprintf("{\"Error\":%q}", r.Err))
 		s.logger.Printf("Received error: %v (%v)", r.Err, r.UUID)
 		return
 	}
