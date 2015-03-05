@@ -13,7 +13,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"path"
+	"path/filepath"
 	"sync"
 
 	"github.com/jroimartin/rpcmq"
@@ -77,7 +79,9 @@ func (w *worker) start() error {
 }
 
 func (w *worker) listCommands(data []byte) ([]byte, error) {
-	w.refreshCommands()
+	if err := w.refreshCommands(); err != nil {
+		return nil, fmt.Errorf("cannot refresh commands: %v", err)
+	}
 
 	w.mu.RLock()
 	defer w.mu.RUnlock()
@@ -89,33 +93,35 @@ func (w *worker) listCommands(data []byte) ([]byte, error) {
 	return b, nil
 }
 
-func (w *worker) refreshCommands() {
+func (w *worker) refreshCommands() error {
 	w.mu.Lock()
 	defer w.mu.Unlock()
 
 	w.commands = map[string]*command{}
+	if err := filepath.Walk(w.cfg.Worker.CmdDir, w.handleFile); err != nil {
+		return err
+	}
+	return nil
+}
 
-	files, err := ioutil.ReadDir(w.cfg.Worker.CmdDir)
+func (w *worker) handleFile(filepath string, info os.FileInfo, err error) error {
 	if err != nil {
-		log.Println("refreshCommands warning:", err)
-		return
+		return err
 	}
 
-	for _, f := range files {
-		if f.IsDir() || path.Ext(f.Name()) != cmdExt {
-			continue
-		}
-
-		filename := path.Join(w.cfg.Worker.CmdDir, f.Name())
-		cmd, err := newCommand(filename)
-		if err != nil {
-			log.Printf("refreshCommands warning (%v): %v\n", f.Name(), err)
-			continue
-		}
-
-		w.commands[cmd.Name] = cmd
-		log.Println("command registered:", cmd.Name)
+	if info.IsDir() || path.Ext(info.Name()) != cmdExt {
+		return nil
 	}
+
+	cmd, err := newCommand(filepath)
+	if err != nil {
+		log.Printf("handleFile warning (%v): %v\n", info.Name(), err)
+		return nil
+	}
+
+	w.commands[cmd.Name] = cmd
+	log.Println("command registered:", cmd.Name)
+	return nil
 }
 
 func (w *worker) execCommand(data []byte) ([]byte, error) {
