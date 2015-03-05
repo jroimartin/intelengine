@@ -5,47 +5,58 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/jroimartin/orujo"
 )
 
-func (s *server) listCommandsHandler(w http.ResponseWriter, r *http.Request) {
-	s.mutex.RLock()
-	defer s.mutex.RUnlock()
+const week = 7 * 24 * time.Hour
 
-	b, err := json.Marshal(s.commands)
+func (s *server) listCommandsHandler(w http.ResponseWriter, r *http.Request) {
+	uuid, err := s.client.Call("listCommands", nil, week)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		orujo.RegisterError(w, fmt.Errorf("cannot marshal commands: %v", err))
+		orujo.RegisterError(w, fmt.Errorf("Call:", err))
 		return
 	}
+	s.logger.Printf("Sent: listCommands(nil) (%v)\n", uuid)
+	fmt.Fprintf(w, "{\"UUID\":\"%q\"}", uuid)
+}
 
-	fmt.Fprint(w, string(b))
+func (s *server) commandResultsHandler(w http.ResponseWriter, r *http.Request) {
+	// TODO(jrm): Query DB to get results
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	uuid := strings.TrimPrefix(r.URL.Path, "/cmd/result/")
+	result, found := s.results[uuid]
+	if !found {
+		w.WriteHeader(http.StatusNotFound)
+		orujo.RegisterError(w, fmt.Errorf("result not found for uuid: %v", uuid))
+		return
+	}
+	delete(s.results, uuid)
+	fmt.Fprint(w, string(result))
 }
 
 func (s *server) runCommandHandler(w http.ResponseWriter, r *http.Request) {
-	s.mutex.RLock()
-	defer s.mutex.RUnlock()
-
 	name := strings.TrimPrefix(r.URL.Path, "/cmd/exec/")
-
-	cmd := s.command(name)
-	if cmd == nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		orujo.RegisterError(w, fmt.Errorf("command not found: %v", name))
-		return
-	}
-
-	out, err := cmd.exec(r.Body)
+	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		orujo.RegisterError(w, fmt.Errorf("command execution error: %v", err))
+		orujo.RegisterError(w, fmt.Errorf("ReadAll:", err))
 		return
 	}
-
-	fmt.Fprint(w, string(out))
+	data := []byte(fmt.Sprintf("%s|%s", name, body))
+	uuid, err := s.client.Call("execCommand", data, week)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		orujo.RegisterError(w, fmt.Errorf("Call:", err))
+		return
+	}
+	s.logger.Printf("Sent: execCommand(%v) (%v)\n", data, uuid)
+	fmt.Fprintf(w, "{\"UUID\":\"%q\"}", uuid)
 }

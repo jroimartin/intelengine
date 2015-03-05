@@ -1,7 +1,3 @@
-// Copyright 2014 The intelengine Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-
 package main
 
 import (
@@ -13,12 +9,12 @@ import (
 )
 
 type config struct {
-	Server serverConfig
+	Worker workerConfig
 	Broker brokerConfig
 }
 
-type serverConfig struct {
-	Addr string
+type workerConfig struct {
+	CmdDir string
 }
 
 type brokerConfig struct {
@@ -49,6 +45,6 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	s := newServer(cfg)
-	log.Fatalln(s.start())
+	w := newWorker(cfg)
+	log.Fatalln(w.start())
 }
