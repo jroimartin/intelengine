@@ -27,6 +27,7 @@ type brokerConfig struct {
 	KeyFile  string
 	CAFile   string
 	Queue    string
+	Exchange string
 }
 
 func main() {

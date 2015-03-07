@@ -60,7 +60,8 @@ func (w *worker) start() error {
 			RootCAs:      caCertPool,
 		}
 	}
-	w.server = rpcmq.NewServer(w.cfg.Broker.URI, w.cfg.Broker.Queue)
+	w.server = rpcmq.NewServer(w.cfg.Broker.URI, w.cfg.Broker.Queue,
+		w.cfg.Broker.Exchange, "direct")
 	w.server.TLSConfig = tlsConfig
 	if err := w.server.Init(); err != nil {
 		return fmt.Errorf("Init: %v", err)

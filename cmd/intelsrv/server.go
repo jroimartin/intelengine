@@ -61,7 +61,8 @@ func (s *server) start() error {
 			RootCAs:      caCertPool,
 		}
 	}
-	s.client = rpcmq.NewClient(s.cfg.Broker.URI, s.cfg.Broker.Queue)
+	s.client = rpcmq.NewClient(s.cfg.Broker.URI, s.cfg.Broker.Queue,
+		s.cfg.Broker.Exchange, "direct")
 	s.client.TLSConfig = tlsConfig
 	if err := s.client.Init(); err != nil {
 		return fmt.Errorf("Init: %v", err)
