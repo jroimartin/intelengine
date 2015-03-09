@@ -48,17 +48,15 @@ called. It must include the following information:
 
 The following snippet shows a dummy cmd file:
 
-```json
-{
-	"Description": "echo request's body",
-	"Cmd": "cat",
-	"Args": [],
-	"Input": "",
-	"Output": "",
-	"Parameters": "",
-	"Group": "debug"
-}
-```
+	{
+		"Description": "echo request's body",
+		"Cmd": "cat",
+		"Args": [],
+		"Input": "",
+		"Output": "",
+		"Parameters": "",
+		"Group": "debug"
+	}
 
 Also, the definition files must have the extension ".cmd", being the name of the
 command the name of the file without this extension.
