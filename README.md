@@ -21,17 +21,39 @@ The main goals of intelengine can be summarized in:
 
 intelengine consists in a client-server architecture.
 
-intelsrv, the **server** component, is an HTTP server that exposes a REST API,
-	that allows the communication between server and clients. The mission of
-	intelsrv is handling command execution requests and transmit the output of
-	the issued commands to the client, as well as taking care of error handling,
-	concurrency, caching, server's OS abstraction, etc.
+**intelsrv**, the server component, is an HTTP server that exposes a REST API,
+that allows the communication between server and clients. The mission of
+intelsrv is handling execution flows and distribute tasks between the different
+intelworker present in the architecture. Besides that, it also taskes care of
+error handling, concurrency and caching
 
-The **client** can be any program able to interact with the intelsrv's REST API.
+**intelworker**, the worker component is responsible for executing the commands
+issued by clients and transmit their results back to intelsrv. intelworker is
+designed to be programming language agnostic, so commands can be coded using
+any language that can read from STDIN and write to STDOUT.
+
+Finally, the **client** can be any program able to interact with the intelsrv's
+REST API.
+
+It is important to note that the communication between the different instances
+of intelserver and intelworker is carried out via a message broker using the
+amqp protocol.
+
+```
++--------+  http    +------------+  amqp    +--------+  amqp    +---------------+
+| client |----+---->| intelsrv_1 |----+---->| BROKER |----+---->| intelworker_1 |
++--------+    |     +------------+    |     +--------+    |     +---------------+
+              |     +------------+    |                   |     +---------------+
+              +---->| intelsrv_2 |----+                   +---->| intelworker_2 |
+              |     +------------+    |                   |     +---------------+
+              |     +------------+    |                   |     +---------------+
+              +---->| intelsrv_n |----+                   +---->| intelworker_m |
+                    +------------+                              +---------------+
+```
 
 ## Commands
 
-Commands are splitted in two parts:
+Commands live with intelworker and are splitted in two parts:
 
 * **Definition file** (cmd file)
 * **Implementation** (standalone executable)
@@ -70,11 +92,13 @@ and write its output in JSON format to STDOUT. Also, it must exit with the
 return value 0 when the execution finished correctly, or any other value on
 error.
 
-The input of the command is the body of the PUT request sent to the intelsrv's
-path "/cmd/exec/\<cmdname\>". On the other hand, the output of the command will
-be returned to the client in the response body if the command exited
-successfully. Otherwise, if the command exited with error, an HTTP 500 error
-code is returned to the client.
+The input of the command is the body of the POST request sent to the intelsrv's
+path "/cmd/exec/\<cmdname\>". When the users makes this request, an unique ID
+will be generated and returned in the response. This way it is possible to
+retrieve the result of the command sending a GET request to
+"/cmd/result/\<uuid\>", being the output of the command returned to the client
+in the response body. If the command exited with error, this error will be
+returned in the "Error" field within the JSON response.
 
 Commands must take care of the input and output types specified in their
 definition file. Also, input and output must be treated as arrays of those
@@ -95,6 +119,7 @@ but also for exploitation, crawlering, etc.
 
 The following routes are configured by default:
 
-* **GET /cmd/refresh**: Refresh command list
 * **GET /cmd/list**: List supported commands
 * **POST /cmd/exec/\<cmdname\>**: Execute the command \<cmdname\>
+* **GET /cmd/result/\<uuid\>**: Retrieve the result of the command linked
+	to the UUID \<uuid\>
