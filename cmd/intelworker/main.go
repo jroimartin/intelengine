@@ -31,10 +31,11 @@ type brokerConfig struct {
 }
 
 func main() {
+	flag.Usage = usage
 	flag.Parse()
 
 	if flag.NArg() != 1 {
-		fmt.Fprintln(os.Stderr, "usage: intelsrv config")
+		flag.Usage()
 		os.Exit(2)
 	}
 	configFile := flag.Arg(0)
@@ -52,4 +53,8 @@ func main() {
 
 	w := newWorker(cfg)
 	log.Fatalln(w.start())
+}
+
+func usage() {
+	fmt.Fprintln(os.Stderr, "usage: intelworker config")
 }
