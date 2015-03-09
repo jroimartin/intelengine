@@ -20,7 +20,7 @@ The config file have the following format:
 			"CmdDir": "/path/to/cmds"
 		},
 		"Broker": {
-			"URI": "amqp://amqp_broker:5672",
+			"URI": "amqps://amqp_broker:5671",
 			"CertFile": "/path/to/cert.pem",
 			"KeyFile": "/path/to/key.pem",
 			"CAFile": "/path/to/cacert.pem",
