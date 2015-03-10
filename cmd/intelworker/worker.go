@@ -63,19 +63,18 @@ func (w *worker) start() error {
 	w.server = rpcmq.NewServer(w.cfg.Broker.URI, w.cfg.Broker.Queue,
 		w.cfg.Broker.Exchange, "direct")
 	w.server.TLSConfig = tlsConfig
-	if err := w.server.Init(); err != nil {
-		return fmt.Errorf("Init: %v", err)
-	}
-	defer w.server.Shutdown()
-
-	w.refreshCommands()
 	if err := w.server.Register("listCommands", w.listCommands); err != nil {
 		return err
 	}
 	if err := w.server.Register("execCommand", w.execCommand); err != nil {
 		return err
 	}
+	if err := w.server.Init(); err != nil {
+		return fmt.Errorf("Init: %v", err)
+	}
+	defer w.server.Shutdown()
 
+	w.refreshCommands()
 	select {}
 }
 
