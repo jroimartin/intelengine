@@ -79,7 +79,7 @@ func (w *worker) start() error {
 	select {}
 }
 
-func (w *worker) listCommands(data []byte) ([]byte, error) {
+func (w *worker) listCommands(task string, data []byte) ([]byte, error) {
 	if err := w.refreshCommands(); err != nil {
 		return nil, fmt.Errorf("cannot refresh commands: %v", err)
 	}
@@ -125,7 +125,7 @@ func (w *worker) handleFile(filepath string, info os.FileInfo, err error) error 
 	return nil
 }
 
-func (w *worker) execCommand(data []byte) ([]byte, error) {
+func (w *worker) execCommand(task string, data []byte) ([]byte, error) {
 	w.mu.RLock()
 	defer w.mu.RUnlock()
 
