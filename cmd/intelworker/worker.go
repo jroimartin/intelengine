@@ -21,9 +21,7 @@ import (
 	"github.com/jroimartin/rpcmq"
 )
 
-const (
-	sep = '|'
-)
+const sep = '|'
 
 type worker struct {
 	cfg    config
