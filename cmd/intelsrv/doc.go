@@ -26,7 +26,8 @@ The config file have the following format:
 			"CertFile": "/path/to/cert.pem",
 			"KeyFile": "/path/to/key.pem",
 			"CAFile": "/path/to/cacert.pem",
-			"Queue": "queue_name",
+			"MsgsQueue": "msgs_queue_name",
+			"RepliesQueue": "replies_queue_name",
 			"Exchange": "exchange_name"
 		}
 	}

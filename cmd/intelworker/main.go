@@ -22,12 +22,12 @@ type workerConfig struct {
 }
 
 type brokerConfig struct {
-	URI      string
-	CertFile string
-	KeyFile  string
-	CAFile   string
-	Queue    string
-	Exchange string
+	URI       string
+	CertFile  string
+	KeyFile   string
+	CAFile    string
+	MsgsQueue string
+	Exchange  string
 }
 
 func main() {

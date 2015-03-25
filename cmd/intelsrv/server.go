@@ -39,7 +39,8 @@ func newServer(cfg config) *server {
 }
 
 func (s *server) start() error {
-	if s.cfg.Server.Addr == "" || s.cfg.Broker.URI == "" || s.cfg.Broker.Queue == "" {
+	if s.cfg.Server.Addr == "" || s.cfg.Broker.URI == "" ||
+		s.cfg.Broker.MsgsQueue == "" || s.cfg.Broker.RepliesQueue == "" {
 		return errors.New("missing configuration parameters")
 	}
 
@@ -61,8 +62,8 @@ func (s *server) start() error {
 			RootCAs:      caCertPool,
 		}
 	}
-	s.client = rpcmq.NewClient(s.cfg.Broker.URI, s.cfg.Broker.Queue,
-		s.cfg.Broker.Exchange, "direct")
+	s.client = rpcmq.NewClient(s.cfg.Broker.URI, s.cfg.Broker.MsgsQueue,
+		s.cfg.Broker.RepliesQueue, s.cfg.Broker.Exchange, "direct")
 	s.client.TLSConfig = tlsConfig
 	if err := s.client.Init(); err != nil {
 		return fmt.Errorf("Init: %v", err)

@@ -36,7 +36,7 @@ func newWorker(cfg config) *worker {
 }
 
 func (w *worker) start() error {
-	if w.cfg.Worker.CmdDir == "" || w.cfg.Broker.URI == "" || w.cfg.Broker.Queue == "" {
+	if w.cfg.Worker.CmdDir == "" || w.cfg.Broker.URI == "" || w.cfg.Broker.MsgsQueue == "" {
 		return errors.New("missing configuration parameters")
 	}
 
@@ -58,7 +58,7 @@ func (w *worker) start() error {
 			RootCAs:      caCertPool,
 		}
 	}
-	w.server = rpcmq.NewServer(w.cfg.Broker.URI, w.cfg.Broker.Queue,
+	w.server = rpcmq.NewServer(w.cfg.Broker.URI, w.cfg.Broker.MsgsQueue,
 		w.cfg.Broker.Exchange, "direct")
 	w.server.TLSConfig = tlsConfig
 	if err := w.server.Register("listCommands", w.listCommands); err != nil {
