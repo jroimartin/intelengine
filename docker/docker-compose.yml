@@ -16,5 +16,3 @@ rabbitmq:
         image: jroimartin/rabbitmq
         ports:
                 - "15672:15672"
-        expose:
-                - "5672:5672"
