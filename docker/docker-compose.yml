@@ -1,0 +1,20 @@
+intelworker:
+        image: jroimartin/intelworker
+        links:
+                - rabbitmq
+        volumes:
+                - data:/commands
+
+intelsrv:
+        image: jroimartin/intelsrv
+        links:
+                - rabbitmq
+        ports:
+                - "8001:8001"
+
+rabbitmq:
+        image: jroimartin/rabbitmq
+        ports:
+                - "15672:15672"
+        expose:
+                - "5672:5672"
